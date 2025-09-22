@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ejercicio de Respiración en Realidad Aumentada</title>
+    <title>Ejercicio de Respiración - Terapia AR</title>
+    <meta name="description" content="Experiencia de realidad aumentada para ejercicios de respiración">
     
-    <!-- Librerías principales -->
+    <!-- Librerías -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.7/aframe/build/aframe-ar.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -24,6 +25,8 @@
             font-family: 'Arial', sans-serif;
             background: #000;
             color: white;
+            width: 100vw;
+            height: 100vh;
         }
 
         /* Pantalla de carga */
@@ -39,40 +42,83 @@
             justify-content: center;
             align-items: center;
             z-index: 10000;
-            transition: opacity 0.5s ease;
+            text-align: center;
+            padding: 20px;
         }
 
         #loading.hidden {
-            opacity: 0;
-            pointer-events: none;
+            display: none;
         }
 
         .loader {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255,255,255,0.3);
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(76, 201, 240, 0.3);
+            border-top: 5px solid #4cc9f0;
             border-radius: 50%;
-            border-top-color: #4cc9f0;
-            animation: spin 1s ease-in-out infinite;
+            animation: spin 1s linear infinite;
             margin-bottom: 20px;
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .loading-text {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #4cc9f0;
         }
 
         .loading-subtext {
-            font-size: 0.9em;
+            font-size: 1em;
             opacity: 0.8;
-            text-align: center;
+            line-height: 1.6;
             max-width: 300px;
-            line-height: 1.4;
+        }
+
+        /* Botones flotantes */
+        .floating-buttons {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 9999;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 90%;
+        }
+
+        .floating-btn {
+            width: 55px;
+            height: 55px;
+            background: rgba(76, 201, 240, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            font-size: 1.4em;
+            transition: all 0.3s ease;
+            border: 2px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .floating-btn:hover {
+            transform: scale(1.15);
+            background: rgba(76, 201, 240, 1);
+        }
+
+        .floating-btn.save-contact {
+            background: rgba(34, 197, 94, 0.9);
+        }
+
+        .floating-btn.website {
+            background: rgba(139, 69, 19, 0.9);
         }
 
         /* Instrucciones */
@@ -81,91 +127,91 @@
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             padding: 15px 25px;
             border-radius: 25px;
             z-index: 9998;
             text-align: center;
             font-size: 1.1em;
+            border: 2px solid #4cc9f0;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: all 0.3s ease;
+            max-width: 90%;
         }
 
         #instructions.found {
             background: rgba(76, 201, 240, 0.9);
             color: #000;
+            border-color: white;
         }
 
-        /* Botones sociales */
-        .social-links {
-            position: fixed;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 15px;
-            z-index: 9999;
-        }
-
-        .social-links a {
-            width: 50px;
-            height: 50px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-decoration: none;
-            font-size: 1.5em;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .social-links a:hover {
-            background: rgba(76, 201, 240, 0.9);
-            transform: scale(1.1);
-        }
-
-        /* Mensaje de error */
-        #error-message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255,0,0,0.9);
-            padding: 20px;
-            border-radius: 10px;
-            z-index: 10001;
-            text-align: center;
+        /* Modal de contacto */
+        .contact-modal {
             display: none;
-            max-width: 300px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 10001;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* A-Frame scene adjustments */
-        a-scene {
-            width: 100%;
-            height: 100vh;
+        .contact-content {
+            background: #1a1a2e;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 300px;
+            width: 90%;
+            border: 2px solid #4cc9f0;
+        }
+
+        .contact-options {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .contact-option {
+            padding: 10px 15px;
+            background: #4cc9f0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .loading-text {
+            .floating-btn {
+                width: 50px;
+                height: 50px;
                 font-size: 1.2em;
             }
             
             #instructions {
                 font-size: 0.9em;
-                top: 10px;
-                padding: 10px 20px;
+                padding: 12px 20px;
             }
             
-            .social-links a {
+            .loading-text {
+                font-size: 1.4em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .floating-buttons {
+                bottom: 10px;
+                gap: 10px;
+            }
+            
+            .floating-btn {
                 width: 45px;
                 height: 45px;
-                font-size: 1.3em;
+                font-size: 1.1em;
             }
         }
     </style>
@@ -174,11 +220,11 @@
     <!-- Pantalla de carga -->
     <div id="loading">
         <div class="loader"></div>
-        <div class="loading-text">🌿 Cargando Ejercicio de Respiración</div>
+        <div class="loading-text">🌿 Terapia de Respiración AR</div>
         <div class="loading-subtext">
-            <p>✅ Permite el acceso a la cámara cuando lo solicite</p>
+            <p>✅ Permite el acceso a la cámara</p>
             <p>🎯 Enfoca el marcador con tu dispositivo</p>
-            <p>💡 Busca un lugar bien iluminado</p>
+            <p>🌬️ Sigue el ritmo de respiración</p>
         </div>
     </div>
 
@@ -187,16 +233,20 @@
         <i class="fas fa-search"></i> Buscando marcador...
     </div>
 
-    <!-- Mensaje de error -->
-    <div id="error-message">
-        <i class="fas fa-exclamation-triangle"></i>
-        <div id="error-text"></div>
-        <button onclick="location.reload()" style="margin-top: 10px; padding: 5px 15px; background: white; border: none; border-radius: 5px; cursor: pointer;">
-            Reintentar
-        </button>
+    <!-- Modal de guardar contacto -->
+    <div id="contactModal" class="contact-modal">
+        <div class="contact-content">
+            <h3>📱 Guardar Contacto</h3>
+            <p>Elige cómo quieres guardar nuestra información:</p>
+            <div class="contact-options">
+                <button class="contact-option" onclick="saveVCard()">VCard</button>
+                <button class="contact-option" onclick="saveToContacts()">Contactos</button>
+                <button class="contact-option" onclick="closeModal()">Cerrar</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Escena de A-Frame -->
+    <!-- Escena de Realidad Aumentada -->
     <a-scene 
         vr-mode-ui="enabled: false"
         embedded 
@@ -206,8 +256,7 @@
             matrixCodeType: 3x3;
             debugUIEnabled: false;
         "
-        renderer="logarithmicDepthBuffer: true; precision: medium;"
-        stats="false">
+        renderer="logarithmicDepthBuffer: true;">
 
         <!-- Marcador AR -->
         <a-marker 
@@ -216,9 +265,7 @@
             url="data/pattern-marker.patt"
             emitevents="true"
             smooth="true"
-            smoothCount="10"
-            smoothTolerance="0.01"
-            smoothThreshold="5">
+            smoothCount="10">
 
             <!-- Video de respiración -->
             <a-video
@@ -231,41 +278,25 @@
                 autoplay="true"
                 loop="true"
                 preload="auto"
-                crossorigin="anonymous"
-                material="shader: flat;"
-                animation="property: rotation; to: -90 360 0; loop: true; dur: 10000">
+                crossorigin="anonymous">
             </a-video>
-
-            <!-- Marco decorativo -->
-            <a-plane
-                position="0 0.5 0.01"
-                width="2.0"
-                height="1.2"
-                color="#4cc9f0"
-                opacity="0.3"
-                shader="flat">
-            </a-plane>
 
             <!-- Título -->
             <a-text
-                value="EJERCICIO DE RESPIRACIÓN"
+                value="TERAPIA DE RESPIRACIÓN"
                 position="0 1.3 0"
                 align="center"
                 color="#4cc9f0"
-                scale="1.2 1.2 1.2"
-                shader="msdf"
-                font="https://cdn.aframe.io/fonts/mozillavr.fnt">
+                scale="1.0 1.0 1.0">
             </a-text>
 
-            <!-- Instrucciones debajo del video -->
+            <!-- Instrucciones -->
             <a-text
-                value="Inhala y exhala con el video\nMantén el marcador visible"
+                value="Inhala profundamente\nExhala lentamente"
                 position="0 -0.8 0"
                 align="center"
                 color="#ffffff"
-                scale="0.8 0.8 0.8"
-                shader="msdf"
-                font="https://cdn.aframe.io/fonts/mozillavr.fnt">
+                scale="0.7 0.7 0.7">
             </a-text>
         </a-marker>
 
@@ -277,15 +308,25 @@
         <a-entity light="type: directional; color: #fff; intensity: 0.8" position="-1 2 1"></a-entity>
     </a-scene>
 
-    <!-- Enlaces sociales -->
-    <div class="social-links">
-        <a href="https://instagram.com/tu_usuario" target="_blank" title="Síguenos en Instagram">
+    <!-- Botones flotantes -->
+    <div class="floating-buttons">
+        <!-- Instagram -->
+        <a href="https://instagram.com/tu_usuario" target="_blank" class="floating-btn" title="Síguenos en Instagram">
             <i class="fab fa-instagram"></i>
         </a>
-        <a href="https://wa.me/1234567890" target="_blank" title="Contáctanos por WhatsApp">
+
+        <!-- WhatsApp -->
+        <a href="https://wa.me/1234567890" target="_blank" class="floating-btn" title="Chatea por WhatsApp">
             <i class="fab fa-whatsapp"></i>
         </a>
-        <a href="https://tuweb.com" target="_blank" title="Visita nuestro sitio web">
+
+        <!-- Guardar Contacto -->
+        <a href="#" class="floating-btn save-contact" title="Guardar Contacto" onclick="showContactModal()">
+            <i class="fas fa-address-book"></i>
+        </a>
+
+        <!-- Sitio Web -->
+        <a href="https://tusitio.com" target="_blank" class="floating-btn website" title="Visita nuestro sitio web">
             <i class="fas fa-globe"></i>
         </a>
     </div>
@@ -295,120 +336,112 @@
         let sceneLoaded = false;
         let markerFound = false;
 
-        // Ocultar pantalla de carga cuando la escena esté lista
+        // Inicialización cuando la escena carga
         document.querySelector('a-scene').addEventListener('loaded', function() {
-            console.log('✅ Escena de A-Frame cargada correctamente');
+            console.log('✅ Realidad Aumentada cargada');
             sceneLoaded = true;
             
-            setTimeout(function() {
+            setTimeout(() => {
                 document.getElementById('loading').classList.add('hidden');
-            }, 2000);
+            }, 2500);
         });
 
         // Elementos del DOM
         const instructions = document.getElementById('instructions');
-        const errorMessage = document.getElementById('error-message');
-        const errorText = document.getElementById('error-text');
         const marker = document.getElementById('ar-marker');
         const video = document.getElementById('breathing-video');
+        const contactModal = document.getElementById('contactModal');
 
-        // Manejar detección del marcador
-        marker.addEventListener('markerFound', function() {
-            console.log('🎯 Marcador detectado!');
+        // Detección del marcador
+        marker.addEventListener('markerFound', () => {
+            console.log('🎯 Marcador detectado');
             markerFound = true;
-            instructions.innerHTML = '<i class="fas fa-check-circle"></i> Marcador detectado - Sigue respirando';
+            instructions.innerHTML = '<i class="fas fa-check-circle"></i> Marcador detectado - Respira con el video';
             instructions.classList.add('found');
         });
 
-        marker.addEventListener('markerLost', function() {
-            console.log('❌ Marcador perdido');
+        marker.addEventListener('markerLost', () => {
+            console.log('🔍 Marcador perdido');
             markerFound = false;
-            instructions.innerHTML = '<i class="fas fa-search"></i> Busca el marcador con tu cámara';
+            instructions.innerHTML = '<i class="fas fa-search"></i> Enfoca el marcador con tu cámara';
             instructions.classList.remove('found');
         });
 
-        // Manejar eventos del video
-        video.addEventListener('loadeddata', function() {
+        // Manejo del video
+        video.addEventListener('loadeddata', () => {
             console.log('✅ Video cargado correctamente');
-            hideError();
         });
 
-        video.addEventListener('canplay', function() {
-            console.log('▶️ Video listo para reproducir');
-            // Intentar reproducir automáticamente
-            video.play().catch(function(error) {
-                console.log('🔇 Autoplay bloqueado, esperando interacción del usuario');
-            });
+        video.addEventListener('error', (e) => {
+            console.error('❌ Error con el video:', e);
+            instructions.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error con el video';
         });
 
-        video.addEventListener('error', function(e) {
-            console.error('❌ Error cargando el video:', e);
-            showError('Error al cargar el video. Verifica la conexión o recarga la página.');
+        // Funciones para el modal de contacto
+        function showContactModal() {
+            contactModal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            contactModal.style.display = 'none';
+        }
+
+        function saveVCard() {
+            // Crear y descargar VCard
+            const vcard = `BEGIN:VCARD
+VERSION:3.0
+FN:Nombre del Terapeuta
+ORG:Terapia de Respiración
+TEL:1234567890
+URL:https://tusitio.com
+EMAIL:info@tusitio.com
+NOTE:Terapeuta especializado en ejercicios de respiración
+END:VCARD`;
+
+            const blob = new Blob([vcard], { type: 'text/vcard' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'contacto.vcf';
+            a.click();
+            closeModal();
+        }
+
+        function saveToContacts() {
+            // Intentar usar la API de contactos del navegador
+            if ('contacts' in navigator && 'select' in navigator.contacts) {
+                navigator.contacts.select(['name', 'tel', 'email'], { multiple: false })
+                .then(console.log)
+                .catch(console.error);
+            } else {
+                // Fallback para dispositivos móviles
+                window.open('tel:1234567890');
+            }
+            closeModal();
+        }
+
+        // Cerrar modal al hacer clic fuera
+        contactModal.addEventListener('click', (e) => {
+            if (e.target === contactModal) closeModal();
         });
 
-        // Manejar errores de la escena
-        window.addEventListener('arjs-video-loaded', function() {
-            console.log('📹 Video de la cámara listo');
-        });
-
-        // Permitir reproducción al hacer clic/touch en la página
-        document.addEventListener('click', function() {
+        // Permitir reproducción al tocar la pantalla
+        document.addEventListener('click', () => {
             if (video.paused) {
-                video.play().then(function() {
-                    console.log('▶️ Video reproducido manualmente');
-                }).catch(function(error) {
-                    console.log('❌ No se pudo reproducir el video:', error);
-                });
-            }
-        });
-
-        // Manejar errores de permisos de cámara
-        window.addEventListener('arjs-source-ready', function() {
-            console.log('📷 Cámara accesible');
-        });
-
-        window.addEventListener('arjs-video-error', function() {
-            showError('Error al acceder a la cámara. Asegúrate de permitir los permisos.');
-        });
-
-        // Funciones de utilidad
-        function showError(message) {
-            errorText.textContent = message;
-            errorMessage.style.display = 'block';
-        }
-
-        function hideError() {
-            errorMessage.style.display = 'none';
-        }
-
-        // Verificar estado cada 5 segundos
-        setInterval(function() {
-            if (sceneLoaded && !markerFound) {
-                console.log('🔍 Esperando detección del marcador...');
-            }
-        }, 5000);
-
-        // Manejar visibilidad de la página
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden && markerFound) {
                 video.play().catch(console.log);
             }
         });
 
-        // Cargar fuentes y recursos adicionales
-        window.onload = function() {
-            console.log('🚀 Página completamente cargada');
-            
-            // Precargar fuente
-            const font = new FontFace('Mozillavr', 'url(https://cdn.aframe.io/fonts/mozillavr.fnt)');
-            font.load().then(function(loadedFont) {
-                document.fonts.add(loadedFont);
-            });
-        };
+        // Cerrar modal con ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
 
-        // Manejar errores globales
-        window.addEventListener('error', function(e) {
-            console.error('Error global:', e.error);
+        // Manejar cambios de visibilidad
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && markerFound) {
+                video.play().catch(console.log);
+            }
         });
     </script>
 </body>
