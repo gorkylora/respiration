@@ -5,66 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ejercicio de Respiración AR</title>
     
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.7/aframe/build/aframe-ar.js"></script>
+    <!-- Versiones ESTABLES que funcionan -->
+    <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.7/aframe/build/aframe-ar.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             margin: 0;
+            padding: 0;
             overflow: hidden;
-            background: #000;
             font-family: Arial, sans-serif;
-            width: 100vw;
-            height: 100vh;
+            background: black;
         }
 
-        /* Pantalla inicial - cuando no hay marcador */
-        #start-screen {
+        #loading {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            background: #000;
             color: white;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            text-align: center;
             z-index: 10000;
-            padding: 20px;
+            text-align: center;
         }
 
-        #start-screen.hidden {
+        #loading.hidden {
             display: none;
         }
 
-        .qr-instructions {
-            margin: 30px 0;
-            padding: 20px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            max-width: 300px;
-        }
-
-        .qr-image {
-            width: 200px;
-            height: 200px;
-            margin: 20px 0;
-            background: white;
-            padding: 10px;
-            border-radius: 10px;
-        }
-
-        /* Botones sociales - siempre visibles */
         .social-buttons {
             position: fixed;
             bottom: 20px;
@@ -78,7 +52,7 @@
         .social-btn {
             width: 50px;
             height: 50px;
-            background: rgba(76, 201, 240, 0.9);
+            background: #4cc9f0;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -86,154 +60,160 @@
             color: white;
             text-decoration: none;
             font-size: 1.3em;
-            transition: all 0.3s ease;
             border: 2px solid white;
         }
 
-        .social-btn:hover {
-            transform: scale(1.1);
-            background: rgba(76, 201, 240, 1);
-        }
-
-        /* Indicador de detección */
-        #detection-indicator {
+        #instructions {
             position: fixed;
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255,0,0,0.8);
+            background: rgba(0,0,0,0.8);
             color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
+            padding: 15px 25px;
+            border-radius: 25px;
             z-index: 9998;
-            transition: all 0.3s ease;
-        }
-
-        #detection-indicator.detected {
-            background: rgba(0,255,0,0.8);
+            text-align: center;
+            max-width: 90%;
         }
     </style>
 </head>
 <body>
-    <!-- Pantalla inicial con instrucciones -->
-    <div id="start-screen">
-        <h1>🌿 Terapia de Respiración AR</h1>
-        
-        <div class="qr-instructions">
-            <h3>¿CÓMO USARLO?</h3>
-            <p>1. <strong>Enfoca tu cámara</strong> hacia este mismo marcador</p>
-            <p>2. <strong>Permite el acceso</strong> a la cámara</p>
-            <p>3. <strong>Disfruta</strong> del ejercicio de respiración</p>
-        </div>
-
-        <div class="qr-image">
-            <!-- Aquí va la imagen del marcador HIRO -->
-            <p>📱 Este MISMO marcador activará la realidad aumentada</p>
-        </div>
-
-        <p>¡El video aparecerá automáticamente sobre el marcador!</p>
+    <div id="loading">
+        <h2>🌿 Cargando Experiencia AR</h2>
+        <p>Por favor, permite el acceso a la cámara</p>
     </div>
 
-    <!-- Indicador de detección -->
-    <div id="detection-indicator">
-        🔍 Buscando marcador...
-    </div>
+    <div id="instructions">Enfoca el marcador con tu cámara</div>
 
-    <!-- Escena de Realidad Aumentada -->
+    <!-- ESCENA AR - CONFIGURACIÓN SIMPLE QUE FUNCIONA -->
     <a-scene 
         vr-mode-ui="enabled: false"
         embedded 
-        arjs="sourceType: webcam; detectionMode: mono; matrixCodeType: 3x3;"
-        renderer="logarithmicDepthBuffer: true;">
+        arjs='sourceType: webcam; debugUIEnabled: false;'
+        renderer="antialias: true; alpha: true">
 
-        <!-- Marcador HIRO (recomendado para mejor detección) -->
-        <a-marker id="ar-marker" preset="hiro">
-            <!-- Video de respiración -->
-            <a-video
-                src="respiracion.mp4"
+        <!-- USAR MARCADOR HIRO (EL MÁS CONFIABLE) -->
+        <a-marker preset="hiro">
+            <a-plane 
                 position="0 0.5 0"
-                width="1.8"
-                height="1.0"
+                width="1.6"
+                height="0.9"
                 rotation="-90 0 0"
-                autoplay="true"
-                loop="true"
-                onclick="togglePlay()">
-            </a-video>
-
-            <!-- Título -->
-            <a-text
-                value="RESPIRACIÓN CONSCIENTE"
-                position="0 1.3 0"
-                align="center"
-                color="#4cc9f0"
-                scale="1.2 1.2 1.2">
-            </a-text>
-
-            <!-- Instrucciones interactivas -->
-            <a-text
-                value="Toca el video para pausar/reanudar"
-                position="0 -0.8 0"
-                align="center"
-                color="#ffffff"
-                scale="0.6 0.6 0.6">
+                material="shader: flat; src: #video-texture;"
+                onclick="toggleVideo()">
+            </a-plane>
+            
+            <a-text value="EJERCICIO DE RESPIRACIÓN" 
+                   position="0 1.3 0" 
+                   align="center" 
+                   color="#4cc9f0"
+                   scale="1.5 1.5 1.5">
             </a-text>
         </a-marker>
 
+        <!-- CÁMARA -->
         <a-entity camera></a-entity>
-        <a-entity light="type: ambient; color: #888; intensity: 0.6"></a-entity>
-        <a-entity light="type: directional; color: #fff; intensity: 0.8" position="-1 2 1"></a-entity>
     </a-scene>
 
-    <!-- Botones sociales - siempre accesibles -->
+    <!-- VIDEO OCULTO QUE SE USA COMO TEXTURA -->
+    <video id="video-source" 
+           src="respiracion.mp4" 
+           loop 
+           crossorigin="anonymous" 
+           style="display: none;">
+    </video>
+
+    <!-- BOTONES SOCIALES -->
     <div class="social-buttons">
-        <a href="https://instagram.com/tu_usuario" class="social-btn" target="_blank" title="Instagram">
+        <a href="https://instagram.com/tu_usuario" class="social-btn" target="_blank">
             <i class="fab fa-instagram"></i>
         </a>
-        <a href="https://wa.me/1234567890" class="social-btn" target="_blank" title="WhatsApp">
+        <a href="https://wa.me/1234567890" class="social-btn" target="_blank">
             <i class="fab fa-whatsapp"></i>
         </a>
-        <a href="tel:1234567890" class="social-btn" title="Llamar">
+        <a href="tel:1234567890" class="social-btn">
             <i class="fas fa-phone"></i>
         </a>
-        <a href="https://tusitio.com" class="social-btn" target="_blank" title="Sitio Web">
+        <a href="https://tusitio.com" class="social-btn" target="_blank">
             <i class="fas fa-globe"></i>
         </a>
     </div>
 
     <script>
-        // Elementos del DOM
-        const startScreen = document.getElementById('start-screen');
-        const detectionIndicator = document.getElementById('detection-indicator');
-        const marker = document.getElementById('ar-marker');
-        const video = document.querySelector('a-video');
-
-        // Cuando la escena esté lista
-        document.querySelector('a-scene').addEventListener('loaded', function() {
-            console.log('✅ AR cargado - Listo para detectar marcador');
-        });
-
-        // Detectar cuando se encuentra el marcador
-        marker.addEventListener('markerFound', function() {
-            console.log('🎯 Marcador detectado!');
-            detectionIndicator.innerHTML = '✅ Marcador detectado';
-            detectionIndicator.classList.add('detected');
-            startScreen.classList.add('hidden');
+        // ESPERAR A QUE AFRAME CARGUE
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('Página cargada, inicializando AR...');
             
-            // Intentar reproducir video
-            video.play().catch(function(error) {
-                console.log('Esperando interacción para reproducir...');
+            // CREAR TEXTURA DE VIDEO MANUALMENTE (MÁS CONFIABLE)
+            const video = document.getElementById('video-source');
+            const scene = document.querySelector('a-scene');
+            
+            scene.addEventListener('loaded', function() {
+                console.log('Escena AR cargada');
+                
+                // Ocultar loading
+                setTimeout(function() {
+                    document.getElementById('loading').classList.add('hidden');
+                }, 2000);
+                
+                // Intentar cargar video
+                video.load();
+                video.play().catch(function(error) {
+                    console.log('Autoplay bloqueado, necesita interacción');
+                });
+            });
+            
+            // CREAR MATERIAL DE VIDEO
+            const videoTexture = new THREE.VideoTexture(video);
+            const videoMaterial = new THREE.MeshBasicMaterial({ 
+                map: videoTexture,
+                transparent: true,
+                opacity: 1
+            });
+            
+            // ESPERAR A QUE EL VIDEO CARGUE
+            video.addEventListener('loadeddata', function() {
+                console.log('Video cargado correctamente');
+                videoTexture.needsUpdate = true;
+            });
+            
+            video.addEventListener('error', function(e) {
+                console.error('Error cargando video:', e);
+                document.getElementById('instructions').innerHTML = 
+                    'Error con el video. Recarga la página.';
             });
         });
 
-        // Detectar cuando se pierde el marcador
-        marker.addEventListener('markerLost', function() {
-            console.log('🔍 Marcador perdido');
-            detectionIndicator.innerHTML = '🔍 Buscando marcador...';
-            detectionIndicator.classList.remove('detected');
-        });
+        // DETECTAR MARCADOR
+        const marker = document.querySelector('a-marker');
+        const instructions = document.getElementById('instructions');
+        
+        if (marker) {
+            marker.addEventListener('markerFound', function() {
+                console.log('MARCADOR DETECTADO!');
+                instructions.innerHTML = '✅ Marcador detectado';
+                instructions.style.background = '#4cc9f0';
+                instructions.style.color = 'black';
+                
+                // REPRODUCIR VIDEO CUANDO SE DETECTA MARCADOR
+                const video = document.getElementById('video-source');
+                video.play().catch(function(error) {
+                    console.log('Esperando interacción para reproducir video...');
+                });
+            });
+            
+            marker.addEventListener('markerLost', function() {
+                console.log('Marcador perdido');
+                instructions.innerHTML = 'Enfoca el marcador con tu cámara';
+                instructions.style.background = 'rgba(0,0,0,0.8)';
+                instructions.style.color = 'white';
+            });
+        }
 
-        // Controlar reproducción del video al tocarlo
-        function togglePlay() {
+        // FUNCIÓN PARA PAUSAR/REANUDAR VIDEO
+        function toggleVideo() {
+            const video = document.getElementById('video-source');
             if (video.paused) {
                 video.play();
             } else {
@@ -241,28 +221,19 @@
             }
         }
 
-        // Permitir reproducción al tocar cualquier parte de la pantalla
+        // PERMITIR REPRODUCCIÓN AL TOCAR LA PANTALLA
         document.addEventListener('click', function() {
+            const video = document.getElementById('video-source');
             if (video.paused) {
-                video.play().catch(console.log);
+                video.play().catch(function(error) {
+                    console.log('Intentando reproducir video...');
+                });
             }
         });
 
-        // Manejar errores del video
-        video.addEventListener('error', function(e) {
-            console.error('Error con el video:', e);
-            detectionIndicator.innerHTML = '❌ Error con el video';
-            detectionIndicator.style.background = 'rgba(255,0,0,0.8)';
-        });
-
-        // Cargar la imagen del marcador HIRO en la pantalla inicial
-        window.addEventListener('load', function() {
-            const qrImage = document.querySelector('.qr-image');
-            qrImage.innerHTML = `
-                <img src="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png" 
-                     alt="Marcador HIRO" style="width: 100%; height: 100%;">
-                <p style="font-size: 12px; margin-top: 5px;">Marcador HIRO</p>
-            `;
+        // MANEJAR ERRORES GLOBALES
+        window.addEventListener('error', function(e) {
+            console.error('Error global:', e.error);
         });
     </script>
 </body>
