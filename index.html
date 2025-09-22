@@ -3,294 +3,524 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ejercicio de Respiración AR</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.7/aframe/build/aframe-ar.min.js"></script>
+    <title>Respiración Consciente - Ejercicio Guiado</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-            background: black;
+            box-sizing: border-box;
         }
 
-        #loading {
+        :root {
+            --primary: #00658f;
+            --primary-dark: #004a6d;
+            --primary-light: #4a9cc5;
+            --accent: #ff7e5f;
+            --text: #333333;
+            --text-light: #6c757d;
+            --background: #f8f9fa;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .logo {
+            font-size: 2.8rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Loading Screen */
+        #loading-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #000;
-            color: white;
+            background: var(--primary);
+            color: var(--white);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 10000;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        #loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid var(--white);
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+            margin-bottom: 30px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
             text-align: center;
         }
 
-        #loading.hidden {
-            display: none;
+        .loading-subtext {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            text-align: center;
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        .headphones-icon {
+            font-size: 2rem;
+            margin: 20px 0;
+            color: var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Content */
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 968px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Video Section */
+        .video-section {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn.secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn.secondary:hover {
+            background: rgba(0, 101, 143, 0.1);
+        }
+
+        /* Info Section */
+        .info-section {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .info-section h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 10px;
+        }
+
+        .benefits {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .benefits li {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .benefits li:last-child {
+            border-bottom: none;
+        }
+
+        .benefits i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        /* Social Buttons */
+        .social-section {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .social-section h2 {
+            color: var(--primary);
+            margin-bottom: 25px;
+            font-size: 1.8rem;
         }
 
         .social-buttons {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
             display: flex;
-            gap: 15px;
-            z-index: 9999;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
         }
 
         .social-btn {
-            width: 50px;
-            height: 50px;
-            background: #4cc9f0;
+            width: 70px;
+            height: 70px;
+            background: var(--primary);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: var(--white);
             text-decoration: none;
-            font-size: 1.3em;
-            border: 2px solid white;
+            font-size: 1.8rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
         }
 
-        #instructions {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 25px;
-            z-index: 9998;
+        .social-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            background: var(--primary-dark);
+        }
+
+        .social-btn.instagram {
+            background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+        }
+
+        .social-btn.whatsapp {
+            background: #25D366;
+        }
+
+        .social-btn.website {
+            background: var(--accent);
+        }
+
+        .social-btn.contact {
+            background: #6c757d;
+        }
+
+        /* Footer */
+        .footer {
             text-align: center;
-            max-width: 90%;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--text-light);
+            font-size: 0.9rem;
         }
 
-        .debug-info {
-            position: fixed;
-            top: 80px;
-            left: 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            z-index: 9997;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .content {
+                gap: 25px;
+            }
+            
+            .social-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .video-section, .info-section, .social-section {
+                padding: 20px 15px;
+            }
+            
+            .social-buttons {
+                gap: 15px;
+            }
+            
+            .social-btn {
+                width: 55px;
+                height: 55px;
+                font-size: 1.4rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="loading">
-        <h2>🌿 Cargando Experiencia AR</h2>
-        <p>Audio detectado - Configurando video...</p>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loader"></div>
+        <div class="loading-text">Preparando tu experiencia de respiración</div>
+        <div class="headphones-icon">
+            <i class="fas fa-headphones"></i>
+        </div>
+        <div class="loading-subtext">
+            Para una experiencia óptima, te recomendamos usar audífonos y encontrar un lugar tranquilo.
+        </div>
     </div>
 
-    <div id="instructions">Enfoca el marcador HIRO con tu cámara</div>
-    <div class="debug-info" id="debug"></div>
+    <!-- Main Content -->
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-wind"></i>
+            </div>
+            <h1>Respiración Consciente</h1>
+            <p>Una experiencia guiada para reducir el estrés y mejorar tu bienestar mediante técnicas de respiración controlada.</p>
+        </header>
 
-    <!-- ESCENA AR SIMPLIFICADA -->
-    <a-scene 
-        vr-mode-ui="enabled: false"
-        embedded 
-        arjs='sourceType: webcam; debugUIEnabled: false;'
-        renderer="colorManagement: true;">
+        <div class="content">
+            <section class="video-section">
+                <h2>Ejercicio Guiado de Respiración</h2>
+                <div class="video-container">
+                    <iframe id="breathing-video" src="https://www.youtube.com/embed/adpR2UQTElk?si=KAM61wGldQIAoALu&autoplay=1&mute=1" 
+                            title="Ejercicio de respiración consciente" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                    </iframe>
+                </div>
+                <div class="video-controls">
+                    <button class="btn" id="play-btn">
+                        <i class="fas fa-play"></i> Reproducir
+                    </button>
+                    <button class="btn secondary" id="pause-btn">
+                        <i class="fas fa-pause"></i> Pausar
+                    </button>
+                    <button class="btn secondary" id="sound-btn">
+                        <i class="fas fa-volume-up"></i> Sonido
+                    </button>
+                </div>
+            </section>
 
-        <!-- MARCADOR HIRO -->
-        <a-marker id="main-marker" preset="hiro" emitevents="true" smooth="true">
-            
-            <!-- VIDEO VISIBLE - FORMATO CORRECTO -->
-            <a-video
-                id="breathing-video"
-                src="respiracion.mp4"
-                position="0 0.5 0"
-                width="1.6"
-                height="0.9"
-                rotation="0 0 0"  <!-- QUITAMOS ROTACIÓN -->
-                autoplay="true"
-                loop="true"
-                preload="auto"
-                crossorigin="anonymous"
-                material="shader: flat; transparent: true; alphaTest: 0.5"
-                visible="true">
-            </a-video>
+            <section class="info-section">
+                <h2>Beneficios de la Respiración Consciente</h2>
+                <ul class="benefits">
+                    <li>
+                        <i class="fas fa-heart"></i>
+                        <div>
+                            <strong>Reduce el estrés</strong>
+                            <p>Disminuye los niveles de cortisol y promueve la relajación</p>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-brain"></i>
+                        <div>
+                            <strong>Mejora la concentración</strong>
+                            <p>Incrementa el flujo de oxígeno al cerebro</p>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-bed"></i>
+                        <div>
+                            <strong>Promueve el sueño reparador</strong>
+                            <p>Ayuda a calmar la mente antes de dormir</p>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-lungs"></i>
+                        <div>
+                            <strong>Fortalece el sistema respiratorio</strong>
+                            <p>Mejora la capacidad pulmonar y la oxigenación</p>
+                        </div>
+                    </li>
+                </ul>
+                
+                <h2>Instrucciones</h2>
+                <p>Siéntate en una posición cómoda, con la espalda recta. Sigue el ritmo del video, inhalando y exhalando cuando se indique. Practica durante 5-10 minutos al día para obtener mejores resultados.</p>
+            </section>
+        </div>
 
-            <!-- MARCO DE REFERENCIA -->
-            <a-plane
-                position="0 0.5 0.01"
-                width="1.7"
-                height="1.0"
-                color="#4cc9f0"
-                opacity="0.3"
-                transparent="true">
-            </a-plane>
+        <section class="social-section">
+            <h2>Conecta con Nosotros</h2>
+            <div class="social-buttons">
+                <a href="https://instagram.com/tu_usuario" class="social-btn instagram" target="_blank" title="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://wa.me/1234567890" class="social-btn whatsapp" target="_blank" title="WhatsApp">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+                <a href="https://tusitio.com" class="social-btn website" target="_blank" title="Sitio Web">
+                    <i class="fas fa-globe"></i>
+                </a>
+                <a href="tel:1234567890" class="social-btn contact" title="Llamar">
+                    <i class="fas fa-phone"></i>
+                </a>
+            </div>
+        </section>
 
-            <a-text value="RESPIRACIÓN CONSCIENTE" 
-                   position="0 1.4 0" 
-                   align="center" 
-                   color="#4cc9f0"
-                   scale="1.2 1.2 1.2">
-            </a-text>
-
-            <a-text value="Toca para pausar/reanudar" 
-                   position="0 -0.8 0" 
-                   align="center" 
-                   color="#ffffff"
-                   scale="0.7 0.7 0.7">
-            </a-text>
-
-        </a-marker>
-
-        <a-entity camera></a-entity>
-        
-        <!-- LUZ ADICIONAL PARA MEJORAR VISIBILIDAD -->
-        <a-entity light="type: ambient; color: #FFFFFF; intensity: 1.0"></a-entity>
-        <a-entity light="type: directional; color: #FFFFFF; intensity: 0.8" position="1 1 1"></a-entity>
-    </a-scene>
-
-    <!-- BOTONES SOCIALES -->
-    <div class="social-buttons">
-        <a href="https://instagram.com/tu_usuario" class="social-btn" target="_blank">
-            <i class="fab fa-instagram"></i>
-        </a>
-        <a href="https://wa.me/1234567890" class="social-btn" target="_blank">
-            <i class="fab fa-whatsapp"></i>
-        </a>
-        <a href="tel:1234567890" class="social-btn">
-            <i class="fas fa-phone"></i>
-        </a>
-        <a href="https://tusitio.com" class="social-btn" target="_blank">
-            <i class="fas fa-globe"></i>
-        </a>
+        <footer class="footer">
+            <p>© 2023 Respiración Consciente. Todos los derechos reservados. | Diseñado para tu bienestar</p>
+        </footer>
     </div>
 
     <script>
-        // DEBUG: Mostrar información útil
-        const debug = document.getElementById('debug');
+        // Ocultar pantalla de carga después de 3 segundos
+        setTimeout(function() {
+            document.getElementById('loading-screen').classList.add('hidden');
+        }, 3000);
+
+        // Controladores de video
+        const video = document.getElementById('breathing-video');
+        const playBtn = document.getElementById('play-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const soundBtn = document.getElementById('sound-btn');
         
-        function updateDebug(info) {
-            debug.innerHTML = info;
-            console.log('DEBUG:', info);
+        let isMuted = true;
+        
+        // Inicializar video con autoplay muteado (requerido por políticas de navegadores)
+        function initVideo() {
+            // El autoplay ya está configurado en el iframe con &autoplay=1&mute=1
+            console.log('Video inicializado con autoplay');
         }
-
-        // INICIALIZACIÓN
-        window.addEventListener('DOMContentLoaded', function() {
-            updateDebug('Página cargada');
-            
-            const scene = document.querySelector('a-scene');
-            const video = document.getElementById('breathing-video');
-            const instructions = document.getElementById('instructions');
-            const marker = document.getElementById('main-marker');
-
-            // CUANDO LA ESCENA CARGA
-            scene.addEventListener('loaded', function() {
-                updateDebug('Escena AR cargada');
-                
-                setTimeout(function() {
-                    document.getElementById('loading').classList.add('hidden');
-                    updateDebug('Esperando marcador...');
-                }, 2000);
-            });
-
-            // MANEJAR VIDEO
-            if (video) {
-                video.addEventListener('loadeddata', function() {
-                    updateDebug('✅ Video cargado - Audio OK');
-                    instructions.innerHTML += '<br>✅ Video listo';
-                });
-
-                video.addEventListener('canplay', function() {
-                    updateDebug('Video puede reproducirse');
-                });
-
-                video.addEventListener('play', function() {
-                    updateDebug('▶️ Video reproduciéndose');
-                });
-
-                video.addEventListener('error', function(e) {
-                    updateDebug('❌ Error video: ' + e.message);
-                });
-
-                // VERIFICAR VISIBILIDAD DEL VIDEO
-                setTimeout(function() {
-                    const videoEl = video.components.material.material.map.image;
-                    if (videoEl && videoEl.videoWidth > 0) {
-                        updateDebug(`Video: ${videoEl.videoWidth}x${videoEl.videoHeight}`);
-                    } else {
-                        updateDebug('Video element no visible');
-                    }
-                }, 3000);
-            }
-
-            // DETECCIÓN DE MARCADOR
-            if (marker) {
-                marker.addEventListener('markerFound', function() {
-                    updateDebug('🎯 Marcador DETECTADO');
-                    instructions.innerHTML = '✅ Marcador detectado - Video activo';
-                    instructions.style.background = '#4cc9f0';
-                    instructions.style.color = 'black';
-                    
-                    // FORZAR VISIBILIDAD DEL VIDEO
-                    video.setAttribute('visible', 'true');
-                    
-                    // INTENTAR REPRODUCIR
-                    video.play().catch(function(error) {
-                        updateDebug('Autoplay bloqueado: ' + error.message);
-                    });
-                });
-
-                marker.addEventListener('markerLost', function() {
-                    updateDebug('🔍 Marcador perdido');
-                    instructions.innerHTML = 'Enfoca el marcador HIRO';
-                    instructions.style.background = 'rgba(0,0,0,0.8)';
-                    instructions.style.color = 'white';
-                });
-            }
-
-            // CONTROL DE VIDEO AL TOCAR
-            video.addEventListener('click', function(e) {
-                e.stopPropagation();
-                if (video.paused) {
-                    video.play();
-                    updateDebug('▶️ Video reanudado');
-                } else {
-                    video.pause();
-                    updateDebug('⏸️ Video pausado');
-                }
-            });
-
-            // PERMITIR REPRODUCCIÓN AL TOCAR CUALQUIER PARTE
-            document.addEventListener('click', function() {
-                if (video.paused) {
-                    video.play().then(function() {
-                        updateDebug('▶️ Video iniciado por touch');
-                    }).catch(function(error) {
-                        updateDebug('Touch blocked: ' + error.message);
-                    });
-                }
-            });
-
-            // VERIFICAR ESTADO CADA 2 SEGUNDOS
-            setInterval(function() {
-                if (video) {
-                    const state = video.paused ? '⏸️ Pausado' : '▶️ Reproduciendo';
-                    updateDebug(`Estado: ${state} | Marcador: ${marker.object3D.visible ? 'Visible' : 'Oculto'}`);
-                }
-            }, 2000);
+        
+        // Control de reproducción
+        playBtn.addEventListener('click', function() {
+            // Para controlar un video embebido de YouTube, necesitaríamos la API de YouTube
+            // Por ahora, mostramos un mensaje
+            alert('El video ya se reproduce automáticamente. Si no se escucha audio, haz clic en el botón de sonido.');
         });
-
-        // MANEJAR ERRORES
-        window.addEventListener('error', function(e) {
-            updateDebug('ERROR: ' + e.message);
+        
+        pauseBtn.addEventListener('click', function() {
+            alert('Para pausar el video, haz clic directamente en el reproductor de YouTube.');
+        });
+        
+        soundBtn.addEventListener('click', function() {
+            alert('Para activar el sonido, haz clic en el icono de altavoz en el reproductor de YouTube.');
+        });
+        
+        // Inicializar cuando la página cargue
+        window.addEventListener('load', initVideo);
+        
+        // Manejar la visibilidad de la página para pausar/reanudar
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                console.log('Página en segundo plano');
+            } else {
+                console.log('Página visible');
+            }
         });
     </script>
 </body>
