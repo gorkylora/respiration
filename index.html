@@ -4,10 +4,10 @@
     <title>Ejercicio de Respiración en RA</title>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+    
     <style>
+        /* Estilos CSS para posicionar los enlaces de redes sociales en la parte inferior de la pantalla */
         .social-links {
             position: fixed;
             bottom: 20px;
@@ -29,7 +29,7 @@
     <a-scene embedded arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
         <a-marker type="pattern" url="data/pattern-marker.patt">
             <a-video
-                src="https://drive.google.com/uc?export=download&id=1hDToZ5uSHwzRo_sRZ3_PlFa8NZuh7o4t"
+                src="https://github.com/gorkylora/respiration/raw/main/respiracion.mp4"
                 position="0 0.5 0"
                 width="1.6"
                 height="0.9"
@@ -40,7 +40,7 @@
         </a-marker>
         <a-entity camera></a-entity>
     </a-scene>
-
+    
     <div class="social-links">
         <a href="URL_DE_TU_INSTAGRAM" target="_blank">
             <i class="fab fa-instagram"></i>
