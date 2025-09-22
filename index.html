@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ejercicio de Respiración - Terapia AR</title>
-    <meta name="description" content="Experiencia de realidad aumentada para ejercicios de respiración">
+    <title>Ejercicio de Respiración AR</title>
     
-    <!-- Librerías -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.7/aframe/build/aframe-ar.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -20,66 +18,54 @@
 
         body {
             margin: 0;
-            padding: 0;
             overflow: hidden;
-            font-family: 'Arial', sans-serif;
             background: #000;
-            color: white;
+            font-family: Arial, sans-serif;
             width: 100vw;
             height: 100vh;
         }
 
-        /* Pantalla de carga */
-        #loading {
+        /* Pantalla inicial - cuando no hay marcador */
+        #start-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 10000;
             text-align: center;
+            z-index: 10000;
             padding: 20px;
         }
 
-        #loading.hidden {
+        #start-screen.hidden {
             display: none;
         }
 
-        .loader {
-            width: 60px;
-            height: 60px;
-            border: 5px solid rgba(76, 201, 240, 0.3);
-            border-top: 5px solid #4cc9f0;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            font-size: 1.8em;
-            margin-bottom: 15px;
-            color: #4cc9f0;
-        }
-
-        .loading-subtext {
-            font-size: 1em;
-            opacity: 0.8;
-            line-height: 1.6;
+        .qr-instructions {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
             max-width: 300px;
         }
 
-        /* Botones flotantes */
-        .floating-buttons {
+        .qr-image {
+            width: 200px;
+            height: 200px;
+            margin: 20px 0;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        /* Botones sociales - siempre visibles */
+        .social-buttons {
             position: fixed;
             bottom: 20px;
             left: 50%;
@@ -87,14 +73,11 @@
             display: flex;
             gap: 15px;
             z-index: 9999;
-            flex-wrap: wrap;
-            justify-content: center;
-            max-width: 90%;
         }
 
-        .floating-btn {
-            width: 55px;
-            height: 55px;
+        .social-btn {
+            width: 50px;
+            height: 50px;
             background: rgba(76, 201, 240, 0.9);
             border-radius: 50%;
             display: flex;
@@ -102,174 +85,71 @@
             justify-content: center;
             color: white;
             text-decoration: none;
-            font-size: 1.4em;
+            font-size: 1.3em;
             transition: all 0.3s ease;
             border: 2px solid white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        .floating-btn:hover {
-            transform: scale(1.15);
+        .social-btn:hover {
+            transform: scale(1.1);
             background: rgba(76, 201, 240, 1);
         }
 
-        .floating-btn.save-contact {
-            background: rgba(34, 197, 94, 0.9);
-        }
-
-        .floating-btn.website {
-            background: rgba(139, 69, 19, 0.9);
-        }
-
-        /* Instrucciones */
-        #instructions {
+        /* Indicador de detección */
+        #detection-indicator {
             position: fixed;
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.85);
-            padding: 15px 25px;
-            border-radius: 25px;
-            z-index: 9998;
-            text-align: center;
-            font-size: 1.1em;
-            border: 2px solid #4cc9f0;
-            backdrop-filter: blur(10px);
-            max-width: 90%;
-        }
-
-        #instructions.found {
-            background: rgba(76, 201, 240, 0.9);
-            color: #000;
-            border-color: white;
-        }
-
-        /* Modal de contacto */
-        .contact-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 10001;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .contact-content {
-            background: #1a1a2e;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            max-width: 300px;
-            width: 90%;
-            border: 2px solid #4cc9f0;
-        }
-
-        .contact-options {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .contact-option {
-            padding: 10px 15px;
-            background: #4cc9f0;
+            background: rgba(255,0,0,0.8);
             color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 9998;
+            transition: all 0.3s ease;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .floating-btn {
-                width: 50px;
-                height: 50px;
-                font-size: 1.2em;
-            }
-            
-            #instructions {
-                font-size: 0.9em;
-                padding: 12px 20px;
-            }
-            
-            .loading-text {
-                font-size: 1.4em;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .floating-buttons {
-                bottom: 10px;
-                gap: 10px;
-            }
-            
-            .floating-btn {
-                width: 45px;
-                height: 45px;
-                font-size: 1.1em;
-            }
+        #detection-indicator.detected {
+            background: rgba(0,255,0,0.8);
         }
     </style>
 </head>
 <body>
-    <!-- Pantalla de carga -->
-    <div id="loading">
-        <div class="loader"></div>
-        <div class="loading-text">🌿 Terapia de Respiración AR</div>
-        <div class="loading-subtext">
-            <p>✅ Permite el acceso a la cámara</p>
-            <p>🎯 Enfoca el marcador con tu dispositivo</p>
-            <p>🌬️ Sigue el ritmo de respiración</p>
+    <!-- Pantalla inicial con instrucciones -->
+    <div id="start-screen">
+        <h1>🌿 Terapia de Respiración AR</h1>
+        
+        <div class="qr-instructions">
+            <h3>¿CÓMO USARLO?</h3>
+            <p>1. <strong>Enfoca tu cámara</strong> hacia este mismo marcador</p>
+            <p>2. <strong>Permite el acceso</strong> a la cámara</p>
+            <p>3. <strong>Disfruta</strong> del ejercicio de respiración</p>
         </div>
+
+        <div class="qr-image">
+            <!-- Aquí va la imagen del marcador HIRO -->
+            <p>📱 Este MISMO marcador activará la realidad aumentada</p>
+        </div>
+
+        <p>¡El video aparecerá automáticamente sobre el marcador!</p>
     </div>
 
-    <!-- Instrucciones -->
-    <div id="instructions">
-        <i class="fas fa-search"></i> Buscando marcador...
-    </div>
-
-    <!-- Modal de guardar contacto -->
-    <div id="contactModal" class="contact-modal">
-        <div class="contact-content">
-            <h3>📱 Guardar Contacto</h3>
-            <p>Elige cómo quieres guardar nuestra información:</p>
-            <div class="contact-options">
-                <button class="contact-option" onclick="saveVCard()">VCard</button>
-                <button class="contact-option" onclick="saveToContacts()">Contactos</button>
-                <button class="contact-option" onclick="closeModal()">Cerrar</button>
-            </div>
-        </div>
+    <!-- Indicador de detección -->
+    <div id="detection-indicator">
+        🔍 Buscando marcador...
     </div>
 
     <!-- Escena de Realidad Aumentada -->
     <a-scene 
         vr-mode-ui="enabled: false"
         embedded 
-        arjs="
-            sourceType: webcam;
-            detectionMode: mono;
-            matrixCodeType: 3x3;
-            debugUIEnabled: false;
-        "
+        arjs="sourceType: webcam; detectionMode: mono; matrixCodeType: 3x3;"
         renderer="logarithmicDepthBuffer: true;">
 
-        <!-- Marcador AR -->
-        <a-marker 
-            id="ar-marker"
-            type="pattern" 
-            url="data/pattern-marker.patt"
-            emitevents="true"
-            smooth="true"
-            smoothCount="10">
-
+        <!-- Marcador HIRO (recomendado para mejor detección) -->
+        <a-marker id="ar-marker" preset="hiro">
             <!-- Video de respiración -->
             <a-video
-                id="breathing-video"
                 src="respiracion.mp4"
                 position="0 0.5 0"
                 width="1.8"
@@ -277,171 +157,112 @@
                 rotation="-90 0 0"
                 autoplay="true"
                 loop="true"
-                preload="auto"
-                crossorigin="anonymous">
+                onclick="togglePlay()">
             </a-video>
 
             <!-- Título -->
             <a-text
-                value="TERAPIA DE RESPIRACIÓN"
+                value="RESPIRACIÓN CONSCIENTE"
                 position="0 1.3 0"
                 align="center"
                 color="#4cc9f0"
-                scale="1.0 1.0 1.0">
+                scale="1.2 1.2 1.2">
             </a-text>
 
-            <!-- Instrucciones -->
+            <!-- Instrucciones interactivas -->
             <a-text
-                value="Inhala profundamente\nExhala lentamente"
+                value="Toca el video para pausar/reanudar"
                 position="0 -0.8 0"
                 align="center"
                 color="#ffffff"
-                scale="0.7 0.7 0.7">
+                scale="0.6 0.6 0.6">
             </a-text>
         </a-marker>
 
-        <!-- Cámara -->
         <a-entity camera></a-entity>
-
-        <!-- Luces -->
         <a-entity light="type: ambient; color: #888; intensity: 0.6"></a-entity>
         <a-entity light="type: directional; color: #fff; intensity: 0.8" position="-1 2 1"></a-entity>
     </a-scene>
 
-    <!-- Botones flotantes -->
-    <div class="floating-buttons">
-        <!-- Instagram -->
-        <a href="https://instagram.com/tu_usuario" target="_blank" class="floating-btn" title="Síguenos en Instagram">
+    <!-- Botones sociales - siempre accesibles -->
+    <div class="social-buttons">
+        <a href="https://instagram.com/tu_usuario" class="social-btn" target="_blank" title="Instagram">
             <i class="fab fa-instagram"></i>
         </a>
-
-        <!-- WhatsApp -->
-        <a href="https://wa.me/1234567890" target="_blank" class="floating-btn" title="Chatea por WhatsApp">
+        <a href="https://wa.me/1234567890" class="social-btn" target="_blank" title="WhatsApp">
             <i class="fab fa-whatsapp"></i>
         </a>
-
-        <!-- Guardar Contacto -->
-        <a href="#" class="floating-btn save-contact" title="Guardar Contacto" onclick="showContactModal()">
-            <i class="fas fa-address-book"></i>
+        <a href="tel:1234567890" class="social-btn" title="Llamar">
+            <i class="fas fa-phone"></i>
         </a>
-
-        <!-- Sitio Web -->
-        <a href="https://tusitio.com" target="_blank" class="floating-btn website" title="Visita nuestro sitio web">
+        <a href="https://tusitio.com" class="social-btn" target="_blank" title="Sitio Web">
             <i class="fas fa-globe"></i>
         </a>
     </div>
 
     <script>
-        // Variables globales
-        let sceneLoaded = false;
-        let markerFound = false;
-
-        // Inicialización cuando la escena carga
-        document.querySelector('a-scene').addEventListener('loaded', function() {
-            console.log('✅ Realidad Aumentada cargada');
-            sceneLoaded = true;
-            
-            setTimeout(() => {
-                document.getElementById('loading').classList.add('hidden');
-            }, 2500);
-        });
-
         // Elementos del DOM
-        const instructions = document.getElementById('instructions');
+        const startScreen = document.getElementById('start-screen');
+        const detectionIndicator = document.getElementById('detection-indicator');
         const marker = document.getElementById('ar-marker');
-        const video = document.getElementById('breathing-video');
-        const contactModal = document.getElementById('contactModal');
+        const video = document.querySelector('a-video');
 
-        // Detección del marcador
-        marker.addEventListener('markerFound', () => {
-            console.log('🎯 Marcador detectado');
-            markerFound = true;
-            instructions.innerHTML = '<i class="fas fa-check-circle"></i> Marcador detectado - Respira con el video';
-            instructions.classList.add('found');
+        // Cuando la escena esté lista
+        document.querySelector('a-scene').addEventListener('loaded', function() {
+            console.log('✅ AR cargado - Listo para detectar marcador');
         });
 
-        marker.addEventListener('markerLost', () => {
+        // Detectar cuando se encuentra el marcador
+        marker.addEventListener('markerFound', function() {
+            console.log('🎯 Marcador detectado!');
+            detectionIndicator.innerHTML = '✅ Marcador detectado';
+            detectionIndicator.classList.add('detected');
+            startScreen.classList.add('hidden');
+            
+            // Intentar reproducir video
+            video.play().catch(function(error) {
+                console.log('Esperando interacción para reproducir...');
+            });
+        });
+
+        // Detectar cuando se pierde el marcador
+        marker.addEventListener('markerLost', function() {
             console.log('🔍 Marcador perdido');
-            markerFound = false;
-            instructions.innerHTML = '<i class="fas fa-search"></i> Enfoca el marcador con tu cámara';
-            instructions.classList.remove('found');
+            detectionIndicator.innerHTML = '🔍 Buscando marcador...';
+            detectionIndicator.classList.remove('detected');
         });
 
-        // Manejo del video
-        video.addEventListener('loadeddata', () => {
-            console.log('✅ Video cargado correctamente');
-        });
-
-        video.addEventListener('error', (e) => {
-            console.error('❌ Error con el video:', e);
-            instructions.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error con el video';
-        });
-
-        // Funciones para el modal de contacto
-        function showContactModal() {
-            contactModal.style.display = 'flex';
-        }
-
-        function closeModal() {
-            contactModal.style.display = 'none';
-        }
-
-        function saveVCard() {
-            // Crear y descargar VCard
-            const vcard = `BEGIN:VCARD
-VERSION:3.0
-FN:Nombre del Terapeuta
-ORG:Terapia de Respiración
-TEL:1234567890
-URL:https://tusitio.com
-EMAIL:info@tusitio.com
-NOTE:Terapeuta especializado en ejercicios de respiración
-END:VCARD`;
-
-            const blob = new Blob([vcard], { type: 'text/vcard' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'contacto.vcf';
-            a.click();
-            closeModal();
-        }
-
-        function saveToContacts() {
-            // Intentar usar la API de contactos del navegador
-            if ('contacts' in navigator && 'select' in navigator.contacts) {
-                navigator.contacts.select(['name', 'tel', 'email'], { multiple: false })
-                .then(console.log)
-                .catch(console.error);
+        // Controlar reproducción del video al tocarlo
+        function togglePlay() {
+            if (video.paused) {
+                video.play();
             } else {
-                // Fallback para dispositivos móviles
-                window.open('tel:1234567890');
+                video.pause();
             }
-            closeModal();
         }
 
-        // Cerrar modal al hacer clic fuera
-        contactModal.addEventListener('click', (e) => {
-            if (e.target === contactModal) closeModal();
-        });
-
-        // Permitir reproducción al tocar la pantalla
-        document.addEventListener('click', () => {
+        // Permitir reproducción al tocar cualquier parte de la pantalla
+        document.addEventListener('click', function() {
             if (video.paused) {
                 video.play().catch(console.log);
             }
         });
 
-        // Cerrar modal con ESC
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
+        // Manejar errores del video
+        video.addEventListener('error', function(e) {
+            console.error('Error con el video:', e);
+            detectionIndicator.innerHTML = '❌ Error con el video';
+            detectionIndicator.style.background = 'rgba(255,0,0,0.8)';
         });
 
-        // Manejar cambios de visibilidad
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden && markerFound) {
-                video.play().catch(console.log);
-            }
+        // Cargar la imagen del marcador HIRO en la pantalla inicial
+        window.addEventListener('load', function() {
+            const qrImage = document.querySelector('.qr-image');
+            qrImage.innerHTML = `
+                <img src="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png" 
+                     alt="Marcador HIRO" style="width: 100%; height: 100%;">
+                <p style="font-size: 12px; margin-top: 5px;">Marcador HIRO</p>
+            `;
         });
     </script>
 </body>
